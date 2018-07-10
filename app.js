@@ -8,6 +8,12 @@ const hbs          = require('hbs');
 const mongoose     = require('mongoose');
 const logger       = require('morgan');
 const path         = require('path');
+const session    = require("express-session");
+const MongoStore = require('connect-mongo')(session);
+const cors       = require( "cors" );
+const flash = require( "connect-flash" );
+
+
 
 
 mongoose.Promise = Promise;
@@ -29,6 +35,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(flash());
 
 // Express View engine setup
 
@@ -49,10 +56,29 @@ app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 // default value for title local
 app.locals.title = 'Express - Generated with IronGenerator';
 
+// Might be important to be before session (?)
+// WE NEED THIS TO BE ABLE TO LOG IN FROM THE FRONTEND
+app.use( cors({
+  credentials: true,
+  origin: [ "http://localhost:4200" ]
+}) );
+
+
+// Enable authentication using session + passport
+app.use(session({
+  secret: 'yeahman',
+  resave: true,
+  saveUninitialized: true,
+  store: new MongoStore( { mongooseConnection: mongoose.connection })
+}))
+require('./passport')(app);
 
 
 const index = require('./routes/index');
 app.use('/', index);
+
+const adminRouter = require('./routes/admin-routes');
+app.use('/admin', adminRouter);
 
 
 module.exports = app;
