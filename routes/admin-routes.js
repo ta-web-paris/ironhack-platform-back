@@ -58,7 +58,6 @@ adminRouter.post( "/process-signup", ( req, res, next ) => {
           if ( err ) {
             next( err );
           } else {
-            // Login the user immediately after they've signed up
             req.login( newAdmin, () => {
               // Clear the password before sending (it's a security risk)
               newAdmin.encryptedPassword = undefined;
@@ -88,18 +87,12 @@ adminRouter.get( "/login", ( req, res, next ) => {
 adminRouter.post( "/process-login", ( req, res, next ) => {
     passport.authenticate("local", ( err, theUser, failureDetails ) => {
       if( err ) {
-        // next( err );
         res.status(500).json({ message: 'Something went wrong' });
         return;
       }
 
       if( !theUser ) {
         res.status(401).json(failureDetails);
-        // const err = new Error( "Log in failed: no user or wrong password?" );
-        // err.status = 400;
-        // // res.locals.message = message;
-        // // res.redirect("/admin/login");
-        // next( err );
         return;
       }
 
@@ -113,37 +106,26 @@ adminRouter.post( "/process-login", ( req, res, next ) => {
 
 
 
+// POST LOGOUT
+///////////////////////////////////////////////////////////////////////////
 
-// TEST
-/////////////////////////////////////////////////::
+adminRouter.post( "/logout", ( req, res, next ) => {
+    req.logout();
+    res.status( 200 ).json({ message: "Logged out" });
+})
 
-// adminRouter.get( "/test", ( req, res, next ) => {
-//     Admin.findOne({ email }, "email", (err, foundAdmin) => {
-//         if (err) {
-//             console.log( err );
-//             next(err);
-//             return;
-//         }
-    
-//         if (!foundAdmin) {
-//             console.log( foundAdmin );
-//             next(null, false, { message: 'Incorrect username' });
-//             return;
-//         }
-    
-//         if (!bcrypt.compareSync(password, foundAdmin.encryptedPassword)) {
-//             console.log( "password" );
-//             console.log( password );
-//             console.log( "encrypted password" );
-//             console.log( foundAdmin.encryptedPassword );
-//             next(null, false, { message: 'Incorrect password' });
-//             return;
-//         }
-    
-//         next(null, foundAdmin);
-//       });
-// })
 
+
+// ENSURE LOGGEDIN
+///////////////////////////////////////////////////////////////////////////
+
+adminRouter.get( "/loggedin", ( req, res, next ) => {
+    if( req.isAuthenticated ) {
+        res.status( 200 ).json( req.user );
+        return;
+    }
+    res.status( 403 ).json({ message: "Unauthorized" });
+});
 
 
 module.exports = adminRouter;
