@@ -66,7 +66,19 @@ adminRouter.post( "/process-signup", ( req, res, next ) => {
             });
           }
         });
-      });
+
+      // NIZAR'S EXAMPLE
+      //   Admin.create({ newAdmin })
+      //     .then(( newAdmin ) => {
+      //       req.login( newAdmin, () => {
+      //         newAdmin.encryptedPassword = undefined;
+      //         res.json({ newAdmin });
+      //       });
+      //     })
+      //     .catch(( err ) => {
+      //       next( err );
+      //     });
+    });
 
 });
 
@@ -103,6 +115,36 @@ adminRouter.post( "/process-login", ( req, res, next ) => {
       });
     })( req, res, next );
 });
+
+
+// adminRouter.post( "/process-login", ( req, res, next ) => {
+//   const { email, loginPassword } = req.body;
+
+//   Admin.findOne({ email })
+//     .then(( adminDoc ) => {
+//       if( !adminDoc ) {
+//         const err = new Error( "Email not found" );
+//         next( err );
+//         return;
+//       }
+      
+//       const { encryptedPassword } = adminDoc;
+//       if( !bcrypt.compareSync( loginPassword, encryptedPassword )) {
+//         const err = new Error( "Wrong password" );
+//         next( err );
+//         return;
+//       }
+      
+//       req.login( adminDoc, () => {
+//         adminDoc.encryptedPassword = undefined;
+//         res.json({ adminDoc });
+//       })
+//     })
+//     .catch(( err ) => {
+//       next( err );
+//     })
+
+// })
 
 
 

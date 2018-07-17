@@ -1,18 +1,20 @@
 require('dotenv').config();
 
-const bodyParser   = require( 'body-parser' );
-const cookieParser = require( 'cookie-parser' );
-const express      = require( 'express' );
-const favicon      = require( 'serve-favicon' );
-const hbs          = require( 'hbs' );
-const mongoose     = require( 'mongoose' );
-const session      = require( "express-session" );
-const passport     = require( "passport" );
-const MongoStore   = require( 'connect-mongo' )( session );
-const logger       = require( 'morgan' );
-const path         = require( 'path' );
-const cors         = require( "cors" );
-const flash        = require( "connect-flash" );
+const bodyParser      = require( 'body-parser' );
+const cookieParser    = require( 'cookie-parser' );
+const express         = require( 'express' );
+const favicon         = require( 'serve-favicon' );
+const hbs             = require( 'hbs' );
+const mongoose        = require( 'mongoose' );
+const session         = require( "express-session" );
+const passport        = require( "passport" );
+const MongoStore      = require( 'connect-mongo' )( session );
+const logger          = require( 'morgan' );
+const path            = require( 'path' );
+const cors            = require( "cors" );
+const flash           = require( "connect-flash" );
+// NIZAR'S EXAMPLE
+// const passportSetup   = require( "./passport/setup" );
 
 
 
@@ -54,10 +56,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
-app.use((req, res, next) => {
-  res.sendfile(__dirname + '/public/index.html');
-});
-
 
 
 // default value for title local
@@ -77,8 +75,10 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   store: new MongoStore( { mongooseConnection: mongoose.connection })
-}))
+}));
 require('./passport')(app);
+// NIZAR'S EXAMPLE
+// passportSetup( app );
 
 
 const index = require('./routes/index');
@@ -86,6 +86,11 @@ app.use('/', index);
 
 const adminRouter = require('./routes/admin-routes');
 app.use('/admin', adminRouter);
+
+
+app.use((req, res, next) => {
+  res.sendfile(__dirname + '/public/index.html');
+});
 
 
 module.exports = app;
